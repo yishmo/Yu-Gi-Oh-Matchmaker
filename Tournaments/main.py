@@ -11,6 +11,7 @@ import math
 import Player
 
 num_rounds = 0
+dropped_players = [] #keeps track of dropped players
 
 def check_if_played_before(player1, player2):
     for opponent in player1.get_opponents():
@@ -43,8 +44,6 @@ def pair_round(players):
                     del players_copy[i]
                     break
     
-        
-                
     return seats
                 
 
@@ -105,8 +104,8 @@ def drop_player(players):
             break;
         for i in range(len(players)):
             if dropping == players[i].name:
+                dropped_players.append(players[i])
                 del players[i]
-                print(players)
                 break
         print()
     
@@ -114,9 +113,12 @@ def get_results(pairs, players):
     still_playing = set(range(1, len(pairs) + 1))
     while len(still_playing)>0:
         print("Waiting for results from tables", still_playing)
-        table = prompt.for_int("Enter a table number to report results", is_legal = lambda x : x in still_playing, error_message="Enter a table that has not finished their match.")
+        table = prompt.for_int("Enter a table number to report results", is_legal = lambda x : x in still_playing,
+                                error_message="Enter a table that has not finished their match.")
         table -= 1
-        winner = prompt.for_string("Enter a winner ("+ str(pairs[table][0].name) + ") or (" + str(pairs[table][1].name) + ") or (tie)", is_legal = (lambda x : x == pairs[table][0].name or x == pairs[table][1].name or x == "tie"), error_message="please enter the winner's full name or tie")
+        winner = prompt.for_string("Enter a winner ("+ str(pairs[table][0].name) + ") or (" + str(pairs[table][1].name) + ") or (tie)",
+                                    is_legal = (lambda x : x == pairs[table][0].name or x == pairs[table][1].name or x == "tie"),
+                                    error_message="please enter the winner's full name or tie")
         if winner == 'tie':
             pairs[table][0].ties.append(pairs[table][1])
             pairs[table][1].ties.append(pairs[table][0])
@@ -186,13 +188,12 @@ def run_tournament(players, roundNumber, pairs=None):
         if pairs == None:#If we need to generate pairs(i.e. not given from a savefile) then call the pair_round function
             pairs = pair_round(players)
         print_pairings(pairs)
-        write_to_file(players, roundNumber)
+        write_to_file(players, roundNumber, dropped_players)
         append_pairings_to_file("round{}savefile.txt".format(roundNumber), pairs)
         print()
         if len(players)%2 != 0: #if there is a BYE
             pairs[len(pairs)-1][0].wins.append('BYE')#give the player that has a BYE a win
             del pairs[len(pairs)-1] #delete that pairing before get results is called
-        print(pairs)
         get_results(pairs, players)
         drop_player(players)
         roundNumber +=1
@@ -205,52 +206,75 @@ def run_tournament(players, roundNumber, pairs=None):
 #very important function that allows results to be saved into files
 #in between rounds. Can also do many things to force pairings as well
 #change mistakes/go back in time/add players if users understand file structure
+
 def run_from_file(filename):
+
+    global dropped_players
     playerdict = {"BYE" : "BYE"}# must establish the dictionary that will have the names of players along with their associated player object
+    dropped_dict = {} # must be able to distinguish between a dropped player and a player that is still in the tournament
     savefile = open(filename, 'r')
     round_num = savefile.readline().rstrip()#First line in savefile is current round number
     round_num = int(round_num)
     playerNames = savefile.readline().rstrip().split(' ')#second line has all player names
-    currentPlayer = ""
-    entryCategory = None
+    droppedNames = savefile.readline().rstrip().split(' ')#third line has all dropped player names
+    currentplayer = ""
+    entrycategory = None
     pairs = [] #this value will store pairs
+
     for name in playerNames:
-        playerdict[name] = Player.Player(name)#Create all player objects and put them in the playerdict
+        playerdict[name] = Player.Player(name)#create all player objects and put them in the playerdict
+    for name in droppedNames:
+        dropped_dict[name] = Player.Player(name)#create all player objects and put them in the playerdict
     for line in savefile:
         line = line.rstrip()
         if line == "":#there shouldn't be any empty lines (except for the last line)
             pass
         elif line[0] == '%':#the if part of the loop figures out which player and which entry category (that players wins losses or ties) it is inputting
-            currentPlayer = line[1:]
+            currentplayer = line[1:]
         elif line[0] == "$":
-            entryCategory = line[1:]
+            entrycategory = line[1:]
         elif line[0] == "*":#this is a special case, at the end of the file there will be pairings that we need to keep track of
             people = line.split(":")[1]
-            peopleList = people.split(",")
-            for i in range(0, len(peopleList)-1, 2):
-                pairs.append([playerdict[peopleList[i]], playerdict[peopleList[i+1]]])
+            peoplelist = people.split(",")
+            for i in range(0, len(peoplelist)-1, 2):
+                pairs.append([playerdict[peoplelist[i]], playerdict[peoplelist[i+1]]])
         else:
-        #The else part of the loop actually puts the wins losses or ties inside that players attributes
-            if entryCategory == 'wins':
-                    playerdict[currentPlayer].wins.append(playerdict[line])
-            elif entryCategory == 'losses':
-                playerdict[currentPlayer].losses.append(playerdict[line])
+        #the else part of the loop actually puts the wins losses or ties inside that players attributes
+            try:
+                cp_obj = playerdict[currentplayer] #cp_obj = currentplayer object
+            except KeyError:                 #however the current player may be a dropped player
+                cp_obj = dropped_dict[currentplayer]
+            try:
+                lp_obj = playerdict[line]          #lp_obj = currentline that we are proccessing's player
+            except KeyError:                 #however the current line player may be a dropped player
+                lp_obj = dropped_dict[line]
+
+            if entrycategory == 'wins':
+                cp_obj.wins.append(lp_obj)
+            elif entrycategory == 'losses':
+                cp_obj.losses.append(lp_obj)
             elif entryCategory == 'ties':
-                playerdict[currentPlayer].ties.append(playerdict[line])
+                cp_obj.ties.append(lp_obj)
                 
     del playerdict["BYE"]
     players = list(playerdict.values())
+    dropped_players = list(dropped_dict.values())
     savefile.close()
     run_tournament(players, round_num, pairs)
 
+#called directly after a round is paired to save the details about that round.
+#This way if someone makes a mistake, we can go back in time and fix it.
 
-def write_to_file(players, round):
+def write_to_file(players, round, dropped_players):
     savefile = open("round{}savefile.txt".format(round), "w")
     savefile.write(str(round)+"\n")
-    for player in players:
+    for player in players: #first write in the remaining players
         savefile.write(player.name + " ")
     savefile.write("\n")
-    for player in players:
+    for player in dropped_players: #then write in the dropped_players
+        savefile.write(player.name + " ")
+    savefile.write("\n")
+    for player in players + dropped_players:
         savefile.write("%"+player.name+"\n")
         savefile.write("$wins\n")
         for opponent in player.wins:

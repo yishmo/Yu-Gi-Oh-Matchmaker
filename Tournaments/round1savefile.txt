@@ -1,30 +1,11 @@
 1
-better what have this work been should I doing? 
-%better
-$wins
-$losses
-$ties
-%what
-$wins
-$losses
-$ties
-%have
-$wins
-$losses
-$ties
-%this
-$wins
-$losses
-$ties
-%work
-$wins
-$losses
-$ties
+been what I doing? have 
+
 %been
 $wins
 $losses
 $ties
-%should
+%what
 $wins
 $losses
 $ties
@@ -36,4 +17,8 @@ $ties
 $wins
 $losses
 $ties
-*pairs:better,what,have,this,work,been,should,I,doing?,BYE,
+%have
+$wins
+$losses
+$ties
+*pairs:been,what,I,doing?,have,BYE,

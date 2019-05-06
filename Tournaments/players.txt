@@ -1,7 +1,3 @@
-this
-should
-work
-better
 what
 have
 I
