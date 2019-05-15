@@ -96,6 +96,7 @@ def calculate_num_rounds(players):
         num_rounds = 12
 
 def drop_player(players):
+    global dropped_players
     while True:
         dropping = prompt.for_string("Enter the name of player who is dropping or (p)air next round"
                                     , is_legal= lambda x : x in [y.name for y in players] or x == 'p', error_message='Invalid player name or not p')
@@ -105,9 +106,11 @@ def drop_player(players):
         for i in range(len(players)):
             if dropping == players[i].name:
                 dropped_players.append(players[i])
+                print(len(players))
+                print(len(dropped_players))
                 del players[i]
+                print(len(players))
                 break
-        print()
     
 def get_results(pairs, players):
     still_playing = set(range(1, len(pairs) + 1))
@@ -189,7 +192,7 @@ def run_tournament(players, roundNumber, pairs=None):
             pairs = pair_round(players)
         print_pairings(pairs)
         write_to_file(players, roundNumber, dropped_players)
-        append_pairings_to_file("round{}savefile.txt".format(roundNumber), pairs)
+        append_pairings_to_file(f'r{roundNumber}.txt', pairs)
         print()
         if len(players)%2 != 0: #if there is a BYE
             pairs[len(pairs)-1][0].wins.append('BYE')#give the player that has a BYE a win
@@ -215,8 +218,8 @@ def run_from_file(filename):
     savefile = open(filename, 'r')
     round_num = savefile.readline().rstrip()#First line in savefile is current round number
     round_num = int(round_num)
-    playerNames = savefile.readline().rstrip().split(' ')#second line has all player names
-    droppedNames = savefile.readline().rstrip().split(' ')#third line has all dropped player names
+    playerNames = savefile.readline().rstrip().split(';')#second line has all player names
+    droppedNames = savefile.readline().rstrip().split(';')#third line has all dropped player names
     currentplayer = ""
     entrycategory = None
     pairs = [] #this value will store pairs
@@ -253,7 +256,7 @@ def run_from_file(filename):
                 cp_obj.wins.append(lp_obj)
             elif entrycategory == 'losses':
                 cp_obj.losses.append(lp_obj)
-            elif entryCategory == 'ties':
+            elif entrycategory == 'ties':
                 cp_obj.ties.append(lp_obj)
                 
     del playerdict["BYE"]
@@ -266,14 +269,21 @@ def run_from_file(filename):
 #This way if someone makes a mistake, we can go back in time and fix it.
 
 def write_to_file(players, round, dropped_players):
-    savefile = open("round{}savefile.txt".format(round), "w")
+    savefile = open(f'r{round}.txt', "w")
     savefile.write(str(round)+"\n")
+
+    file_str = ''
     for player in players: #first write in the remaining players
-        savefile.write(player.name + " ")
-    savefile.write("\n")
-    for player in dropped_players: #then write in the dropped_players
-        savefile.write(player.name + " ")
-    savefile.write("\n")
+        file_str += f'{player.name};'  
+    file_str = file_str[:-1]
+    savefile.write(f'{file_str}\n')
+
+    file_str = ''
+    for player in dropped_players: #first write in the remaining dropped players
+        file_str += f'{player.name};'  
+    file_str = file_str[:-1]
+    savefile.write(f'{file_str}\n')
+
     for player in players + dropped_players:
         savefile.write("%"+player.name+"\n")
         savefile.write("$wins\n")

@@ -1,0 +1,63 @@
+3
+d;lol;yishan m;e;b;a;h;yishan
+f;c
+%d
+$wins
+c
+$losses
+h
+$ties
+%lol
+$wins
+a
+h
+$losses
+$ties
+%yishan m
+$wins
+$losses
+e
+$ties
+c
+%e
+$wins
+yishan m
+$losses
+$ties
+b
+%b
+$wins
+$losses
+yishan
+$ties
+e
+%a
+$wins
+BYE
+$losses
+lol
+$ties
+%h
+$wins
+d
+$losses
+lol
+$ties
+%yishan
+$wins
+f
+b
+$losses
+$ties
+%f
+$wins
+$losses
+yishan
+$ties
+%c
+$wins
+$losses
+d
+$ties
+yishan m
+*pairs:lol,yishan,e,d,a,h,yishan m,b,
