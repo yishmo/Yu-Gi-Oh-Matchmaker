@@ -1,24 +1,40 @@
 1
-been what I doing? have 
+h b i e c d f g a 
 
-%been
+%h
 $wins
 $losses
 $ties
-%what
+%b
 $wins
 $losses
 $ties
-%I
+%i
 $wins
 $losses
 $ties
-%doing?
+%e
 $wins
 $losses
 $ties
-%have
+%c
 $wins
 $losses
 $ties
-*pairs:been,what,I,doing?,have,BYE,
+%d
+$wins
+$losses
+$ties
+%f
+$wins
+$losses
+$ties
+%g
+$wins
+$losses
+$ties
+%a
+$wins
+$losses
+$ties
+*pairs:h,b,i,e,c,d,f,g,a,BYE,
