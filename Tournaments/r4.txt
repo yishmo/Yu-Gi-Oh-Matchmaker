@@ -1,71 +1,74 @@
 4
-a;b;yishan m;d;lol;e;h
-f;c;yishan
-%a
-$wins
-BYE
-$losses
-lol
-$ties
-h
-%b
-$wins
-yishan m
-$losses
-yishan
-$ties
-e
+yishan m;d;a;b;h;yishan;f;e;c;lol
+
 %yishan m
 $wins
 $losses
-e
 b
+lol
 $ties
-c
+a
 %d
 $wins
-c
-e
-$losses
-h
-$ties
-%lol
-$wins
 a
-h
-yishan
 $losses
+c
 $ties
-%e
+yishan
+%a
 $wins
-yishan m
 $losses
+h
 d
 $ties
-b
+yishan m
+%b
+$wins
+yishan m
+c
+$losses
+$ties
+f
 %h
 $wins
-d
-$losses
-lol
-$ties
 a
-%f
-$wins
-$losses
 yishan
-$ties
-%c
-$wins
 $losses
-d
 $ties
-yishan m
+c
 %yishan
 $wins
-f
-b
 $losses
-lol
+e
+h
 $ties
-*pairs:lol,d,a,b,e,h,yishan m,BYE,
+d
+%f
+$wins
+lol
+e
+$losses
+$ties
+b
+%e
+$wins
+yishan
+$losses
+f
+$ties
+lol
+%c
+$wins
+d
+$losses
+b
+$ties
+h
+%lol
+$wins
+yishan m
+$losses
+f
+$ties
+e
+*pairs:b,h,f,d,e,c,lol,a,yishan m,yishan,

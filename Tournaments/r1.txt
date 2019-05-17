@@ -1,7 +1,7 @@
 1
-yishan m;c;d;h;e;b;a;lol;f;yishan
+a;c;f;b;e;d
 
-%yishan m
+%a
 $wins
 $losses
 $ties
@@ -9,15 +9,7 @@ $ties
 $wins
 $losses
 $ties
-%d
-$wins
-$losses
-$ties
-%h
-$wins
-$losses
-$ties
-%e
+%f
 $wins
 $losses
 $ties
@@ -25,20 +17,12 @@ $ties
 $wins
 $losses
 $ties
-%a
+%e
 $wins
 $losses
 $ties
-%lol
+%d
 $wins
 $losses
 $ties
-%f
-$wins
-$losses
-$ties
-%yishan
-$wins
-$losses
-$ties
-*pairs:yishan m,c,d,h,e,b,a,lol,f,yishan,
+*pairs:a,c,f,b,e,d,

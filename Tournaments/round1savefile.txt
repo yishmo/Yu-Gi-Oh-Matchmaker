@@ -1,1 +1,0 @@
-*pairs:b,e,c,f g,d,a,*pairs:*pairs:d,b,a,c,e,f g,*pairs:*pairs:f g,e,d,b,a,c,*pairs:d,e,c,b,f g,a,*pairs:

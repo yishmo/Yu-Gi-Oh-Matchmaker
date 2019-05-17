@@ -20,32 +20,41 @@ def check_if_played_before(player1, player2):
     
     return False
 
-def sort_players_based_on_point_differential(player, players):
-    num = player.get_points()
-    return sorted(players, key = lambda x : math.sqrt((x.get_points()-num) * (x.get_points()-num)))
+
+#this is my less than perfect algorithm to try to make parings.
+#It swaps seats until players play someone they havent played
+def check_and_swap(seats):
+    callAgain = True
+    numCalls = 0
+    while callAgain:
+        numCalls +=1
+        if numCalls == 50000:
+            assert("check_and_swap failed, manually pair instead" == "")
+        callAgain = False
+        for i in range(len(seats) - 1):
+            player1 = seats[i][0]
+            player2 = seats[i][1]
+            if check_if_played_before(player1, player2):
+                seats[i][1], seats[i+1][0] = seats[i+1][0], seats[i][1]
+                callAgain = True
+                break
+    
+    return seats
 
 def pair_round(players):
     seats = []
     already_paired = []
     random.shuffle(players)
     players = sorted(players, key = lambda x : -x.get_points())
-    players_copy = list(players)
-    for player in players:
-        if player not in already_paired:
-            if len(players_copy) == 1:
-                seats.append([players_copy[0], "BYE"])
-            del players_copy[0]
-            players_copy = sort_players_based_on_point_differential(player, players_copy)
-            for i in range(0, len(players_copy)):
-                if not check_if_played_before(player, players_copy[i]):
-                    seats.append([player, players_copy[i]])
-                    already_paired.append(player)
-                    already_paired.append(players_copy[i])
-                    del players_copy[i]
-                    break
-    
-    return seats
-                
+    if len(players) % 2 == 0: #even
+        for i in range(0, len(players), 2):
+            seats.append([players[i], players[i+1]])
+    else:                     #odd
+        for i in range(len(players)//2):
+            seats.append([players[2*i], players[(2*i) + 1]])
+        seats.append([players[-1], "BYE"])
+
+    return check_and_swap(seats)
 
 
 def print_pairings(seats):
@@ -106,10 +115,7 @@ def drop_player(players):
         for i in range(len(players)):
             if dropping == players[i].name:
                 dropped_players.append(players[i])
-                print(len(players))
-                print(len(dropped_players))
                 del players[i]
-                print(len(players))
                 break
     
 def get_results(pairs, players):
@@ -324,42 +330,42 @@ def print_welcome_screen():
         print("3. Follow on screen prompts to run tournament, all command available are enclosed in ().\n")
         
 def main():
-        print_welcome_screen()
-        shouldLoadFromSavefile = prompt.for_string("Load a (s)aved tournament or start a (n)ew one?" 
-                                                    ,is_legal = (lambda x: x == 's' or x == 'n'), error_message = 'Please enter s or n.')
-        if shouldLoadFromSavefile == "s":
-                fileStr = prompt.for_string("Enter the name of the savefile")
-                run_from_file(fileStr)
-        else:
-                fob = goody.safe_open("Press enter if your partipants are in players.txt, otherwise type out the name of your file.",
-                                    'r', 'There was an error finding/opening the file.', default='players.txt')
-                players = file.get_names(fob)
-                while len(players) < 4:
-                        print()
-                        print("You need at least 4 players to start a tournaments, please edit your file and press enter")
-                        input()
-                        fob.close()
-                        fob = goody.safe_open("Name of file with players", 'r', 'There was an error finding/opening the file.', default='players.txt')
-                        players = file.get_names(fob)
-                        
-                for player in players:
-                        print(player.name)
-                while True:
-                        print("***There are currently", len(players), "players enrolled.***")
-                        start = prompt.for_string("Start tournament? Enter (y)es or (n)o", 
-                                                is_legal = (lambda x: x == 'y' or x == 'n'), error_message = 'Please enter y or n.')
-                        if start =='y':
-                                run_tournament(players, 1)
-                                break
-                        else:
-                                print("Edit file then hit enter.")
-                                input()
-                                fob = goody.safe_open("Name of file with players", 'r', 'There was an error finding/opening the file.', default='players.txt')
-                                players = file.get_names(fob)
-                                for player in players:
-                                        print(player.name)
+    print_welcome_screen()
+    shouldLoadFromSavefile = prompt.for_string("Load a (s)aved tournament or start a (n)ew one?"
+                                                ,is_legal = (lambda x: x == 's' or x == 'n'), error_message = 'Please enter s or n.')
+    if shouldLoadFromSavefile == "s":
+            fileStr = prompt.for_string("Enter the name of the savefile")
+            run_from_file(fileStr)
+    else:
+            fob = goody.safe_open("Press enter if your partipants are in players.txt, otherwise type out the name of your file.",
+                                'r', 'There was an error finding/opening the file.', default='players.txt')
+            players = file.get_names(fob)
+            while len(players) < 4:
+                    print()
+                    print("You need at least 4 players to start a tournaments, please edit your file and press enter")
+                    input()
+                    fob.close()
+                    fob = goody.safe_open("Name of file with players", 'r', 'There was an error finding/opening the file.', default='players.txt')
+                    players = file.get_names(fob)
+                    
+            for player in players:
+                    print(player.name)
+            while True:
+                    print("***There are currently", len(players), "players enrolled.***" )
+                    start = prompt.for_string("Start tournament? Enter (y)es or (n)o", 
+                                            is_legal = (lambda x: x == 'y' or x == 'n'), error_message = 'Please enter y or n.')
+                    if start =='y':
+                            run_tournament(players, 1)
+                            break
+                    else:
+                            print("Edit file then hit enter.")
+                            input()
+                            fob = goody.safe_open("Name of file with players", 'r', 'There was an error finding/opening the file.', default='players.txt')
+                            players = file.get_names(fob)
+                            for player in players:
+                                    print(player.name)
 
-                fob.close()
+            fob.close()
 
 if __name__ == "__main__":
         main()
